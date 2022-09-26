@@ -80,7 +80,8 @@ const Skill: FC<SkillProps<SkillData>> = ({ bp, onDataChanged, onValidChanged, i
   useEffect(() => {
     onDataChanged({
       timeoutDelay,
-      redirectNoAgent
+      redirectNoAgent,
+      selectedTags
     })
 
     onValidChanged(true)

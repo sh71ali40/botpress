@@ -78,7 +78,6 @@ export interface SkillData {
 
 // These are properties provided by the studio
 export interface SkillProps<T> {
-  bp: any
   initialData: T
   onDataChanged: (data: T) => void
   onValidChanged: (canSubmit: boolean) => void
