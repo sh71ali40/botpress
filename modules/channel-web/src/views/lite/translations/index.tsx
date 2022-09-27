@@ -1,6 +1,7 @@
 import { addLocaleData } from 'react-intl'
 import localeAr from 'react-intl/locale-data/ar'
 import localeDe from 'react-intl/locale-data/de'
+import localeFa from 'react-intl/locale-data/fa'
 import localeEn from 'react-intl/locale-data/en'
 import localeEs from 'react-intl/locale-data/es'
 import localeFr from 'react-intl/locale-data/fr'
@@ -11,6 +12,7 @@ import localeRu from 'react-intl/locale-data/ru'
 import localeUk from 'react-intl/locale-data/uk'
 
 import ar from './ar.json'
+import fa from './fa.json'
 import de from './de.json'
 import en from './en.json'
 import es from './es.json'
@@ -25,7 +27,7 @@ type Locale = 'browser' | string
 
 const DEFAULT_LOCALE = 'en'
 const STORAGE_KEY = 'bp/channel-web/user-lang'
-const translations = { en, fr, pt, es, ar, ru, uk, de, it, nl }
+const translations = { en, fr, pt, es, ar, ru, uk, de, it, nl, fa }
 
 const cleanLanguageCode = (str: string) => str.split('-')[0]
 const getNavigatorLanguage = () => cleanLanguageCode(navigator.language || navigator['userLanguage'] || '')
@@ -67,7 +69,8 @@ const initializeLocale = () => {
     ...localeUk,
     ...localeDe,
     ...localeIt,
-    ...localeNl
+    ...localeNl,
+    ...localeFa
   ])
 }
 

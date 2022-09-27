@@ -7,12 +7,16 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl'
 import ToolTip from '../../../../../../packages/ui-shared-lite/ToolTip'
 import { RootStore, StoreDef } from '../store'
 import { isRTLText } from '../utils'
+import { Config } from '../typings'
 
 import VoiceRecorder from './VoiceRecorder'
+import constants from '../core/constants'
+import queryString from 'query-string'
 
 const ENTER_CHAR_CODE = 13
 class Composer extends React.Component<ComposerProps, { isRecording: boolean }> {
   private textInput: React.RefObject<HTMLTextAreaElement>
+  private config!: any
   constructor(props) {
     super(props)
     this.textInput = React.createRef()
@@ -120,6 +124,7 @@ class Composer extends React.Component<ComposerProps, { isRecording: boolean }> 
 
     return (
       <div role="region" className={classNames('bpw-composer', direction)}>
+        <div className={'Buttons'}>{this.renderButtons()}</div>
         <div className={'bpw-composer-inner'}>
           <div className={'bpw-composer-textarea'}>
             <textarea
@@ -182,9 +187,54 @@ class Composer extends React.Component<ComposerProps, { isRecording: boolean }> 
       </div>
     )
   }
+  extractConfig(): Config {
+    let userConfig = Object.assign({}, constants.DEFAULT_CONFIG, this.props.config)
+
+    const { options } = queryString.parse(location.search)
+    if (!options || typeof options !== 'string') {
+      console.warn(`Cannot decode option. Invalid format: ${typeof options}, expecting 'string'.`)
+
+      return userConfig
+    }
+
+    try {
+      const parsedOptions: { config: Config } = JSON.parse(decodeURIComponent(options))
+      userConfig = Object.assign(userConfig, parsedOptions.config)
+
+      return userConfig
+    } catch (err) {
+      // TODO: Handle those errors so they don't directly bubble up to the users
+      throw new Error(`An error occurred while extracting the configurations ${err}`)
+    }
+  }
+
+  renderButtons(): React.ReactNode {
+    this.config = this.extractConfig()
+    //console.log('json', this.config.Buttons)
+
+    let buttons = this.config.Buttons
+
+    if (!buttons || buttons.length == 0) return <div></div>
+
+    let buttonsDiv = buttons.map(
+      (button: {
+        link: string | undefined
+        text: string | undefined
+        id: string | undefined
+        class: string | undefined
+      }) => (
+        <a target="_blank" href={button.link} id={button.id} className={button.class}>
+          {button.text}
+        </a>
+      )
+    )
+
+    return buttonsDiv
+  }
 }
 
 export default inject(({ store }: { store: RootStore }) => ({
+  config: store.config,
   enableVoiceComposer: store.config.enableVoiceComposer,
   message: store.composer.message,
   composerLocked: store.composer.locked,
@@ -217,6 +267,7 @@ type ComposerProps = {
 } & InjectedIntlProps &
   Pick<
     StoreDef,
+    | 'config'
     | 'botName'
     | 'composerPlaceholder'
     | 'intl'
